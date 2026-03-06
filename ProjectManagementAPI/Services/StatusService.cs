@@ -1,7 +1,10 @@
-﻿using EFCoreAPI.Entities.DTOs.Status;
+﻿using EFCoreAPI.Entities.DTOs.Projects;
+using EFCoreAPI.Entities.DTOs.Status;
+using EFCoreAPI.Repositories;
 using EFCoreAPI.Repositories.Interfaces;
 using EFCoreAPI.Repositories.Models;
 using EFCoreAPI.Services.Interfaces;
+using ProjectManagementAPI.Entities;
 
 namespace EFCoreAPI.Services
 {
@@ -72,6 +75,38 @@ namespace EFCoreAPI.Services
                 Description = status.Description,
                 IsActive = status.IsActive
             };
+        }
+
+        public async Task<PagedResult<StatusResponseDto>> GetPaged(bool includeRelations, int page = 1, int pageSize = 10)
+        {
+            var status = await statusRepository.GetAll(includeRelations);
+            if (status != null)
+            {
+                int totalCount = status.Count;
+                var items = status.OrderBy(x => x.Id)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList().Select(x => new StatusResponseDto()
+                    {
+                        Id = x.Id,
+                        Description = x.Description,
+                        IsActive = x.IsActive
+                    });
+                int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
+                return new PagedResult<StatusResponseDto>
+                {
+                    Items = items,
+                    TotalCount = totalCount,
+                    Page = page,
+                    PageSize = pageSize,
+                    TotalPages = totalPages
+                };
+            }
+            else
+            {
+                throw new Exception("There are not status.");
+            }
         }
 
         public async Task Update(int id, StatusRequestDto model)

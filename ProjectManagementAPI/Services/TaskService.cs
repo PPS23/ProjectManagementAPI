@@ -6,6 +6,7 @@ using EFCoreAPI.Entities.DTOs.Users;
 using EFCoreAPI.Repositories.Interfaces;
 using EFCoreAPI.Repositories.Models;
 using EFCoreAPI.Services.Interfaces;
+using ProjectManagementAPI.Entities;
 using System.Threading.Tasks;
 
 namespace EFCoreAPI.Services
@@ -168,6 +169,53 @@ namespace EFCoreAPI.Services
             {
                 throw ex;
             }
+        }
+
+        public async Task<PagedResult<TaskResponseDto>> GetPaged(bool includeRelations = true, int page = 1, int pageSize = 10)
+        {
+            var tasks = await taskRepository.GetAll(includeRelations);
+            if (tasks != null)
+            {
+                int totalCount = tasks.Count;
+                var items = tasks.OrderBy(x => x.Id)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList().Select(t => new TaskResponseDto()
+                    {
+                        Id = t.Id,
+                        ProjectId = t.ProjectId,
+                        Project = new ProjectResponseDto()
+                        {
+                            Id = t.Project.Id,
+                            Name = t.Project.Name,
+                            CreatedDate = t.Project.CreatedDate
+                        },
+                        Status = new StatusResponseDto()
+                        {
+                            Id = t.Status.Id,
+                            Description = t.Status.Description,
+                            IsActive = t.Status.IsActive
+                        },
+                        CreatedDate = t.CreatedDate,
+                        Title = t.Title,
+                        Description = t.Description
+                    });
+                int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
+                return new PagedResult<TaskResponseDto>
+                {
+                    Items = items,
+                    TotalCount = totalCount,
+                    Page = page,
+                    PageSize = pageSize,
+                    TotalPages = totalPages
+                };
+            }
+            else
+            {
+                throw new Exception("There are not Tasks.");
+            }
+            
         }
 
         public async Task Update(int id, TaskRequestDto model)

@@ -1,11 +1,14 @@
 ﻿using EFCoreAPI.Entities.DTOs.Persons;
+using EFCoreAPI.Entities.DTOs.Status;
 using EFCoreAPI.Entities.DTOs.Users;
 using EFCoreAPI.Extensions;
+using EFCoreAPI.Repositories;
 using EFCoreAPI.Repositories.Interfaces;
 using EFCoreAPI.Repositories.Models;
 using EFCoreAPI.Services.Helpers;
 using EFCoreAPI.Services.Interfaces;
 using Microsoft.IdentityModel.Tokens;
+using ProjectManagementAPI.Entities;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -181,7 +184,6 @@ namespace EFCoreAPI.Services
                         LastName = u.Person.LastName,
                         IsActive = u.IsActive
                     }
-
                 }).ToList();
 
                 return usersDto;
@@ -222,6 +224,46 @@ namespace EFCoreAPI.Services
             else
             {
                 throw new Exception("Project Id is required.");
+            }
+        }
+
+        public async Task<PagedResult<UserResponseDto>> GetPaged(bool includeRelations, int page = 1, int pageSize = 10)
+        {
+            var users = await userRepository.GetAll(includeRelations);
+            if (users != null)
+            {
+                int totalCount = users.Count;
+                var items = users.OrderBy(x => x.Id)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList().Select(u => new UserResponseDto()
+                    {
+                        Id = u.Id,
+                        Email = u.Email,
+                        DomainName = u.DomainName,
+                        IsActive = u.IsActive,
+                        Person = new PersonResponseDto()
+                        {
+                            Id = u.Person.Id,
+                            FirstName = u.Person.FirstName,
+                            LastName = u.Person.LastName,
+                            IsActive = u.IsActive
+                        }
+                    });
+                int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
+                return new PagedResult<UserResponseDto>
+                {
+                    Items = items,
+                    TotalCount = totalCount,
+                    Page = page,
+                    PageSize = pageSize,
+                    TotalPages = totalPages
+                };
+            }
+            else
+            {
+                throw new Exception("There are not users.");
             }
         }
     }

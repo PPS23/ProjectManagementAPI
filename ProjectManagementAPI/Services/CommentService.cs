@@ -1,7 +1,12 @@
 ﻿using EFCoreAPI.Entities.DTOs.Comments;
+using EFCoreAPI.Entities.DTOs.Projects;
+using EFCoreAPI.Entities.DTOs.Status;
+using EFCoreAPI.Entities.DTOs.Tasks;
+using EFCoreAPI.Repositories;
 using EFCoreAPI.Repositories.Interfaces;
 using EFCoreAPI.Repositories.Models;
 using EFCoreAPI.Services.Interfaces;
+using ProjectManagementAPI.Entities;
 using System.Runtime.CompilerServices;
 
 namespace EFCoreAPI.Services
@@ -103,6 +108,45 @@ namespace EFCoreAPI.Services
             else
             {
                 throw new Exception("Comment not found.");
+            }
+        }
+
+        public async Task<PagedResult<CommentResponseDto>> GetPaged(bool includeRelations, int page = 1, int pageSize = 10)
+        {
+            var comments = await commentRepository.GetAll(includeRelations);
+            if (comments != null)
+            {
+                int totalCount = comments.Count;
+                var items = comments.OrderBy(x => x.Id)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList().Select(x => new CommentResponseDto()
+                    {
+                        Id = x.Id,
+                        TaskId = x.TaskId,
+                        UserId = x.UserId,
+                        Description = x.Description,
+                        CreatedDate = x.CreatedDate,
+                        User = new Entities.DTOs.Users.UserResponseDto()
+                        {
+                            Id = x.User.Id,
+                            DomainName = x.User.DomainName
+                        }
+                    });
+                int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
+                return new PagedResult<CommentResponseDto>
+                {
+                    Items = items,
+                    TotalCount = totalCount,
+                    Page = page,
+                    PageSize = pageSize,
+                    TotalPages = totalPages
+                };
+            }
+            else
+            {
+                throw new Exception("There are not comments.");
             }
         }
 

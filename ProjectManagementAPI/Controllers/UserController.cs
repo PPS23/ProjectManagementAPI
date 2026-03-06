@@ -84,6 +84,26 @@ namespace EFCoreAPI.Controllers
             }
         }
 
+        [HttpGet("GetPaged")]
+        public async Task<IActionResult> GetPaged(int page = 1, int pageSize = 10)
+        {
+            ResponseDto dataResponse = new ResponseDto();
+            try
+            {
+                dataResponse.Data = await userService.GetPaged(true, page, pageSize);
+                dataResponse.Success = true;
+                dataResponse.Message = "All Paged Users";
+                return Ok(dataResponse);
+            }
+            catch (Exception ex)
+            {
+                dataResponse.Data = null;
+                dataResponse.Success = false;
+                dataResponse.Message = ex.Message;
+                return BadRequest(dataResponse);
+            }
+        }
+
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAll()
         {

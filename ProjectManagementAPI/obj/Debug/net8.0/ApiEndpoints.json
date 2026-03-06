@@ -411,6 +411,27 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "EFCoreAPI.Controllers.TasksController",
+    "Method": "GetPaged",
+    "RelativePath": "api/Tasks/GetPaged",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "EFCoreAPI.Controllers.UserController",
     "Method": "Delete",
     "RelativePath": "api/User/{id}",

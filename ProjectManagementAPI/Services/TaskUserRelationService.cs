@@ -2,6 +2,7 @@
 using EFCoreAPI.Repositories.Interfaces;
 using EFCoreAPI.Repositories.Models;
 using EFCoreAPI.Services.Interfaces;
+using ProjectManagementAPI.Entities;
 
 namespace EFCoreAPI.Services
 {
@@ -78,6 +79,11 @@ namespace EFCoreAPI.Services
             {
                 throw new Exception("Id is required.");
             }
+        }
+
+        public Task<PagedResult<TaskUserRelationResponseDto>> GetPaged(bool includeRelations, int page = 1, int pageSize = 10)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task Update(int id, TaskUserRelationRequestDto model)

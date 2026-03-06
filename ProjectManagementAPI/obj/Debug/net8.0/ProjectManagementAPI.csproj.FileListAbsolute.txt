@@ -278,3 +278,4 @@ C:\Projects\ProjectManagementApp\ProjectManagementAPI\ProjectManagementAPI\obj\D
 C:\Projects\ProjectManagementApp\ProjectManagementAPI\ProjectManagementAPI\obj\Debug\net8.0\ProjectManagementAPI.pdb
 C:\Projects\ProjectManagementApp\ProjectManagementAPI\ProjectManagementAPI\obj\Debug\net8.0\ProjectManagementAPI.genruntimeconfig.cache
 C:\Projects\ProjectManagementApp\ProjectManagementAPI\ProjectManagementAPI\obj\Debug\net8.0\ref\ProjectManagementAPI.dll
+C:\Projects\ProjectManagementApp\ProjectManagementAPI\ProjectManagementAPI\obj\Debug\net8.0\ProjectManagementAPI.sourcelink.json

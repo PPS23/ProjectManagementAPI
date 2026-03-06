@@ -1,7 +1,10 @@
-﻿using EFCoreAPI.Entities.DTOs.Projects;
+﻿using EFCoreAPI.Entities.DTOs.Persons;
+using EFCoreAPI.Entities.DTOs.Projects;
+using EFCoreAPI.Repositories;
 using EFCoreAPI.Repositories.Interfaces;
 using EFCoreAPI.Repositories.Models;
 using EFCoreAPI.Services.Interfaces;
+using ProjectManagementAPI.Entities;
 
 namespace EFCoreAPI.Services
 {
@@ -78,6 +81,39 @@ namespace EFCoreAPI.Services
             else
             {
                 throw new Exception("Project Id is required.");
+            }
+        }
+
+        public async Task<PagedResult<ProjectResponseDto>> GetPaged(bool includeRelations, int page = 1, int pageSize = 10)
+        {
+            var projects = await projectRepository.GetAll(includeRelations);
+            if (projects != null)
+            {
+                int totalCount = projects.Count;
+                var items = projects.OrderBy(x => x.Id)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList().Select(x => new ProjectResponseDto()
+                    {
+                        Id = x.Id,
+                        Name = x.Name,
+                        CreatedDate = DateTime.Now,
+                        IsActive = x.IsActive
+                    });
+                int totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
+                return new PagedResult<ProjectResponseDto>
+                {
+                    Items = items,
+                    TotalCount = totalCount,
+                    Page = page,
+                    PageSize = pageSize,
+                    TotalPages = totalPages
+                };
+            }
+            else
+            {
+                throw new Exception("There are not projects.");
             }
         }
 
